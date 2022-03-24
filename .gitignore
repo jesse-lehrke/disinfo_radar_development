@@ -24,6 +24,9 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Unique VENVs
+
+venv/
 ######################
 # ALL BELOW GENETRATED
 ######################
