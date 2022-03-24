@@ -5,7 +5,9 @@ Private repository for DRI employees and sub-contractors to develop and test ini
 
 ## File structure
 
-As of 24.03.2022 (encluding VENV, including gitgnore directories). Also in file_structure.txt (to-do: automate)
+As of 24.03.2022 (encluding VENV, including gitgnore directories) can be viewed here ![file structure](/file_structure.txt)
+(to-do: automate updating)
+
 .<br>
 ├── analysis<br>
 │   └── outlier_detection.ipynb<br>
