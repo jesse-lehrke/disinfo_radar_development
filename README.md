@@ -5,8 +5,13 @@ Private repository for DRI employees and sub-contractors to develop and test ini
 
 ## File structure
 
-As of 24.03.2022 (encluding VENV, including gitgnore directories) can be viewed here ![file structure](/file_structure.txt)
+As of 24.03.2022 (excluding VENV, including gitgnore directories) can be viewed here ![file structure](/file_structure.txt)
 (to-do: automate updating)
+
+## Data
+
+Data folders are set to gitignore. Sharing and syncing of data must be coordinated. 
+In the past Syncthing folders embedded in a GitHub directory work well.
 
 ## Dependencies
 
