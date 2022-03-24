@@ -2,17 +2,18 @@
 Private repository for DRI employees and sub-contractors to develop and test initial functional ideas for Disinformation Radar project
 
 Current structure including folders in .gitignore:
-.
-├── analysis
-│   └── outlier_detection.ipynb
-├── collection
-│   ├── arxiv_collect.ipynb
-│   └── twitter_collect.ipynb
-├── credentials
-├── data
-├── documentation
-├── input_files
-├── output_data
-├── README.md
-├── requirements.txt
-└── venv
+
+.<br>
+├── analysis<br>
+│   └── outlier_detection.ipynb<br>
+├── collection<br>
+│   ├── arxiv_collect.ipynb<br>
+│   └── twitter_collect.ipynb<br>
+├── credentials<br>
+├── data<br>
+├── documentation<br>
+├── input_files<br>
+├── output_data<br>
+├── README.md<br>
+├── requirements.txt<br>
+└── venv<br>
