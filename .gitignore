@@ -1,3 +1,33 @@
+# Common credential files
+**/credentials/*.json
+**/credentials.json
+**/client_secrets.json
+**/client_secret.json
+*.dat
+*password*
+*.httr-oauth*
+
+# Data folders
+data/
+documentation/
+input_files/
+output_data/
+
+
+# Mac/OSX
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+######################
+# ALL BELOW GENETRATED
+######################
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
