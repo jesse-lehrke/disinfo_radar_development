@@ -3,7 +3,7 @@
 Private repository for DRI employees and sub-contractors to develop and test initial functional ideas for Disinformation Radar project.
 
 
-**File structure**
+## File structure
 
 As of 24.03.2022 (encluding VENV, including gitgnore directories). Also in file_structure.txt (to-do: automate)
 .<br>
@@ -37,6 +37,6 @@ As of 24.03.2022 (encluding VENV, including gitgnore directories). Also in file_
 10 directories, 16 files
 
 
-**Conceptual flow** 
+## Conceptual flow
 
 ![DRAP_1 drawio](https://user-images.githubusercontent.com/59825124/159930897-7b2c24dd-4504-42d3-a84f-1f7e20ec7bb9.svg)
