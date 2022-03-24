@@ -8,35 +8,11 @@ Private repository for DRI employees and sub-contractors to develop and test ini
 As of 24.03.2022 (encluding VENV, including gitgnore directories) can be viewed here ![file structure](/file_structure.txt)
 (to-do: automate updating)
 
-.<br>
-├── analysis<br>
-│   └── outlier_detection.ipynb<br>
-├── collection<br>
-│   ├── arxiv_collect.ipynb<br>
-│   └── twitter_collect.ipynb<br>
-├── credentials<br>
-│   ├── twitter_creds.json<br><br>
-│   └── youtube_key.json<br>
-├── data<br>
-│   ├── arxiv_disinformation.csv<br>
-│   ├── models<br>
-│   └── raw<br>
-│       └── arxiv_disinformation.jsonl<br>
-├── documentation<br>
-│   ├── Antrag_2021.12.20_English.docx<br>
-│   ├── DisinfoRadar Research Onboarding.docx<br>
-│   ├── Launch_report_outline.odt<br>
-│   └── notes.txt<br>
-├── file_stucture.txt<br>
-├── input_files<br>
-├── outputs<br>
-├── processing<br>
-│   └── processing.ipynb<br>
-├── README.md<br>
-├── requirements.txt<br>
-└── file_structure.txt<br>
+## Dependencies
 
-10 directories, 16 files
+In addition to the requirments.txt the following commands can install other anticipated dependencies:
+- nltk.download('stopwords'): run in notebook
+- python -m spacy download en_core_web_sm: run in terminal
 
 
 ## Conceptual flow
