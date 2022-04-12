@@ -60,7 +60,7 @@ if __name__ == '__main__':
     keywords = ["GAN", "GPT-3", "fake news", "disinformation"]
 
     ####turn list of keywords into a list of dataframes with respective queries
-    list_of_dataframes = [arxiv_searcher(x, 100) for x in keywords]
+    list_of_dataframes = [arxiv_searcher(x, 1000) for x in keywords]
 
     ##### concatenate the list of dataframes into a common frame
     df = pd.concat(list_of_dataframes)
