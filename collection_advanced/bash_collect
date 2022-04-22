@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# NAME:         bash_collect
+# SOURCE:       Glutanimate (http://askubuntu.com/users/81372/), 2013
+# DEPENDENCIES: wget lynx
+# DESCRIPTION:  extracts PDF links from websites and dumps them to the stdout and as a textfile
+#               additional functions commented out.
+#                
+# USAGE:        ATTEN: Not working!! bash_collect "www.website.com"
+#
+# EXCUTABLE:    https://askubuntu.com/questions/469331/extracting-all-pdf-links-from-multiple-websites?noredirect=1&lq=1
+
+WEBSITE= "$1"
+
+echo "Getting link list..."
+
+lynx -cache=0 -dump -listonly "$WEBSITE" | grep ".*\.pdf$" | awk '{print $2}' | tee pdflinks.txt
+
+# DIRECT REQUEST (WHEN USAGE FAILS)
+#
+#lynx -cache=0 -dump -listonly 'https://www.cna.org/centers/cna/sppp/rsp/russia-ai-archive#newsletters' | grep ".*\.pdf$" | awk '{print $2}' | tee pdflinks.txt
+#lynx -cache=0 -dump -listonly "https://www.cna.org/centers/cna/cip/china/china-ai-newsletter" | grep ".*\.pdf$" | awk '{print $2}' | tee pdflinks.txt
+
+
+# SAVE/VIEW TEXT OF PAGE
+#
+#lynx -dump https://www.cna.org/centers/cna/sppp/rsp/russia-ai-archive#newsletters > page_text.txt
+
+# DOWNLOAD PDF FILES
+#
+#echo "Downloading..."    
+#wget -P pdflinkextractor_files/ -i pdflinks.txt
