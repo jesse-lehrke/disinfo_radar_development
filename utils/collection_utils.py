@@ -1,3 +1,6 @@
+import re
+from itertools import combinations, permutations, chain
+from datetime import datetime, timedelta
 
 def aggragate(df, group_on, column):
       '''
@@ -28,21 +31,16 @@ def aggragate(df, group_on, column):
 def datetime_parse(x):
       '''
       Parse datetime out of a string
-      More functionality should be added as issues encountered
-      Currently 
+      More functionality should be added as issues encountered 
       '''
       # Remove all non-alpha-numeric
       out = re.sub(r'[^0-9a-zA-Z:]+', ' ', x)
-      
+
       ## Remove any starting tag with :
       # str.split('Updated: ', expand=True)
       
       # Remove time 
-      #   .str.replace(r'\b(([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?\s?([AaPp][Mm])?)', ' ')
-      
-      months = ['January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December', 'Jan', 'Feb', 'Mar', 'Apr', 'May',
-      'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      # .str.replace(r'\b(([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?\s?([AaPp][Mm])?)', ' ')
       
       month_dict = {
       'January':'1', 'February':'2', 'March':'3', 'April':'4', 'May':'5', 'June':'6',
@@ -51,22 +49,20 @@ def datetime_parse(x):
       'Jun':'6', 'Jul':'7', 'Aug':'8', 'Sep':'9', 'Oct':'10', 'Nov':'11', 'Dec':'12'
       }
 
-
       # Removing digits longer than 4 long and words not in months
-      out = [out.replace(key, value) for key, value in month_dict.items() if key in out][0]
+      #out = [out.replace(key, value) for key, value in month_dict.items() if key in out][0]
       
-      # Removing digits longer than 4 long and words not in months (redundant)
-      out = re.sub(r'[0-9]\d{4,}', ' ', out)
-      out = re.sub(r'[0-9]+:[0-9]+', ' ', out) # all after : not tested
-      
+      # Removing digits longer than 4 long and words not in months (now redundant)
+      #out = re.sub(r'[0-9]\d{4,}', ' ', out)
+      #out = re.sub(r'[0-9]+:[0-9]+', ' ', out) # all after : not tested
+
       out = out.split(' ')
-      out = [word for word in out if word.isdigit() or word in months]
+      out = [word for word in out if word.isdigit() or word in list(month_dict.keys())]
       
       out = ' '.join(out[:3])
       # Strip loose whitespace
 
       out = out.strip()
-
       # Lists for parsing
       month = ['%b', '%m', '%B']
       day = ['%d']
@@ -76,8 +72,8 @@ def datetime_parse(x):
       for v in varieties:
             v = ' '.join(v)
             try:
-                  date = [datetime.strptime(str(out), v)]# if d != 0 else d for d in out]
-
+                  date = [datetime.strptime(str(out), v)]# if d != 0 else d for d in out] #old tag used elsewhere, here for ref.
+  
                   if date is not None:
                         print('Successfully parsed with format: ' + v)
                         return date
