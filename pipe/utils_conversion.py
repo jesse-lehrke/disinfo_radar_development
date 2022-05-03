@@ -25,21 +25,22 @@ def get_pdfs(DATA_PATH, QUERY, df):
       timeout_secs = 10 
 
       for index, row in df.iterrows():
-            if row.date >= datetime.now() - timedelta(days=14):
+            #if row.date >= datetime.now() - timedelta(days=14):
 
-                  basename = row.url.split('/')[-1]
-                  basename = basename.split('.')[0]
-                  fname = os.path.join(pdf_dir, basename + '.pdf')
-                  print(fname)
+            basename = row.url.split('/')[-1]
+            basename = basename.split('.')[0]
+            fname = os.path.join(pdf_dir, basename + '.pdf')
+            print(fname)
 
-                  # try:
-                  if not basename in have:
-                        print('fetching %s into %s' % (row.url, fname))
-                        req = urlopen(row.url, None, timeout_secs)
-                        with open(fname, 'wb') as fp:
-                              shutil.copyfileobj(req, fp)
-                  else:
-                        print('%s exists, skipping' % (fname, ))
+            # try:
+            if not basename in have:
+                  print('fetching %s into %s' % (row.url, fname))
+                  clean_url = row.url.replace(" ", "%20")
+                  req = urlopen(clean_url, None, timeout_secs)
+                  with open(fname, 'wb') as fp:
+                        shutil.copyfileobj(req, fp)
+            else:
+                  print('%s exists, skipping' % (fname, ))
 
 def pdf_to_text(DATA_PATH, QUERY):
       # Checking for a program and a folder
@@ -105,39 +106,36 @@ def text_to_csv(DATA_PATH, QUERY):
       return results
 
 
-def bulk_text_to_pdf(dir):
-    done = []
-    #done_path = []
-    problem = []
+def bulk_pdf_to_text(DATA_PATH, QUERY):
+      done = []
+      problem = []
 
-    for root, dirs, files in os.walk(dir):
-        #vari.set("Writing contents")
-        for file in files:
-            path_to_pdf = os.path.join(root, file)
-            [stem, ext] = os.path.splitext(path_to_pdf)
-            if ext == '.pdf':
-                #vari.set("Processing " + path_to_pdf)
-                print("Processing " + path_to_pdf)
-                pdf_contents = parser.from_file(path_to_pdf)
-                path_to_txt = stem + '.txt'
-                name = stem.split('\\')[-1]
-                with open(path_to_txt, 'w', encoding='utf-8') as txt_file:
-                    print("Writing contents to " + path_to_txt)
-                    #vari.set("Writing contents to " + path_to_txt)
-                    if pdf_contents['content'] is None:
-                        pass
-                    else:
-                        pdf_contents = pdf_contents['content'].replace('\n+', '\n', regex=True)
-                        txt_file.write(pdf_contents)
-                size = os.path.getsize(path_to_txt)
-                if size <= 200:
-                    problem.append(name)
-                    problem_path.append(path_to_pdf)                    
-                else:
-                    done.append(name)
-                    #done.append(path_to_pdf)                    
-    #vari.set('Done')
-    str1 = str('Successfully converted: ' + ', '.join(done))
-    str2 = str('Possible problems with: ' + ', '.join(problem))
-    #messagebox.showinfo('Done', str1 + '\n' + str2)
-    print(problem_path)
+      if not os.path.exists(DATA_PATH + QUERY + '_txt'):
+            os.makedirs(DATA_PATH + QUERY + '_txt')
+      
+      txt_dir = DATA_PATH + QUERY + '_txt'
+      pdf_dir = DATA_PATH + QUERY + '_pdfs'
+    
+      for root, dirs, files in os.walk(DATA_PATH):
+            for file in files:
+                  path_to_pdf = os.path.join(root, file)
+                  [stem, ext] = os.path.splitext(path_to_pdf)
+
+                  if ext == '.pdf':
+                        print("Processing " + path_to_pdf)
+                        pdf_contents = parser.from_file(path_to_pdf)
+                        
+                        txt_basename = file.split('.')[0]
+                        print(txt_dir)
+                        print(txt_basename)
+                        path_to_txt = os.path.join(txt_dir, txt_basename)
+
+                        with open(path_to_txt, 'w', encoding='utf-8') as txt_file:
+                              print("Writing contents to " + path_to_txt)
+                              if pdf_contents['content'] is None:
+                                    pass
+                              else:
+                                    #pdf_contents = pdf_contents['content'].replace('\n+', '\n', regex=True)
+                                    txt_file.write(pdf_contents['content'])
+
+

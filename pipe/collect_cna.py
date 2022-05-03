@@ -1,6 +1,5 @@
 '''
-FIX PDF parsing for China!
-Also search term/ filter check
+Add search term/ filter check
 '''
 
 # Imports
@@ -20,17 +19,10 @@ from os import listdir, path
 from datetime import datetime, timedelta
 import json
 
-
-# prep for import of own scripts
-# #this only needs to be done because module not in same place as this py
-import sys
-sys.path.insert(0, '.')
-
 # Importing functions from our own modules
-from utils.conversion_utils import get_pdfs, pdf_to_text, text_to_csv
-from utils.collection_utils import datetime_parse
+from utils_conversion import get_pdfs, pdf_to_text, text_to_csv, bulk_pdf_to_text
 
-def cna_searcher(base_url):
+def cna_searcher(base_url, scraped_times):
       '''
       Currently gets all issues from CNA
       TO DO: add date functionality
@@ -48,7 +40,7 @@ def cna_searcher(base_url):
       url_list = []
       date_list = []
 
-      objects = html.find_all('div', id='newsletters')#elid=True)
+      objects = html.find_all('div', id='newsletters')
 
       for obj in objects:
             items = obj.find_all('li')
@@ -59,30 +51,40 @@ def cna_searcher(base_url):
                   url_list.append('https://www.cna.org' + urls[0]['href'])
 
                   date = i.text
-                  print(date)
-                  try:
-                        d_parsed = datetime_parse(date)
-                        print(d_parsed)
-                        date_list.append(d_parsed[0])
-                  except:
-                        date_list.append('None')
-      
+                  date = date.split(': ')[1]
+                  date = date.split(' [')[0]
+                  date_parsed = datetime.strptime(date, '%B %d, %Y')
+                  date_list.append(date_parsed)
+
       df_collected = pd.DataFrame(list(zip(title_list, url_list, date_list)), 
                   columns=['title', 'url', 'date'])
 
+      # Getting last collection time, if none, getting oldest date in results
+      try:
+            last_collected = datetime.strptime(scraped_times[base_url],'%Y-%m-%dT%H:%M:%SZ')
+      except:
+            last_collected = min(list(df_collected.date))
+      
+      # Filtering dates here, could be done after collection but would need good reason
+      new_df = df_collected[df_collected.date > last_collected]
+      
       # PDF Work
       QUERY = 'CNA' # should we seperate Russia and China?
 
       # consider another subfolder then change PATHs
       get_pdfs(DATA_PATH, QUERY, df_collected)
-      pdf_to_text(DATA_PATH, QUERY)
+      
+      bulk_pdf_to_text(DATA_PATH, QUERY)
+      #pdf_to_text(DATA_PATH, QUERY)
+      
       df_temp = text_to_csv(DATA_PATH, QUERY)
 
-      new_df = df_collected[df_collected['date'] >= datetime.now() - timedelta(days=60)]
+      #new_df = df_collected[df_collected['date'] >= datetime.now() - timedelta(days=60)]
 
+      #try:
       new_df['text'] = df_temp
       #new_df = pd.merge(df_collected, df_temp, on='title', how='outer')
-        
+      
       save_path = DATA_PATH + 'cna_' + QUERY + '_data.csv'
       
       if path.isfile(save_path):
@@ -92,18 +94,32 @@ def cna_searcher(base_url):
             combined_df.to_csv(save_path, index=False)
       else:
             new_df.to_csv(save_path, index=False)
+      # except:
+      #       print('No new PDFs')
 
-      # Should we filter for keywords then? Or want it all?
+      # Saving collection time
+      scraped_times[base_url] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ') 
+      with open(IN_DATA_PATH + 'scraped_times.json', 'w', encoding='utf8') as f:
+            json.dump(scraped_times, f)
+
+      # TO DO Should we filter for keywords then? Or want it all?
 
 if __name__ == '__main__':
-      # for the future
+      # Paths
       dir_path = path.dirname(path.realpath(__file__))
+      DATA_PATH = dir_path + '/data/'
+      IN_DATA_PATH = dir_path + '/data/input_data/'
       
-      DATA_PATH = './data/'
-      IN_DATA_PATH = './data/input_data/'
-      
-      #today = datetime.now()
-      #back_to = today.date() - timedelta(days=30)
+      # Getting last collection date, if none initializing dictionary
+      try:
+            with open(IN_DATA_PATH + 'scraped_times.json') as f:
+                  scraped_times = json.load(f)     
+      except:
+            with open(IN_DATA_PATH + 'scraped_times.json', 'w', encoding='utf8') as f:
+                  init_dict = {}
+                  json.dump(init_dict, f)
+            with open(IN_DATA_PATH + 'scraped_times.json') as f:
+                  scraped_times = json.load(f)  
 
       # Getting base url from json
       load_file = IN_DATA_PATH + 'collection_urls_dict.json'
@@ -123,5 +139,5 @@ if __name__ == '__main__':
       # Have not used everywhere, but no reason you cannot
       ssl._create_default_https_context = ssl._create_unverified_context
 
-      cna_searcher(base_url_1)
-      #cna_searcher(base_url_2) # PDF converter getting syntax errors
+      cna_searcher(base_url_1, scraped_times)
+      #cna_searcher(base_url_2, scraped_times)

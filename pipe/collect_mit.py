@@ -11,24 +11,15 @@ import json
 import re
 import time
 
-# prep for import of own scripts
-# #this only needs to be done because module not in same place as this py
-import sys
-sys.path.insert(0, '.')
-
-# Importing functions from our own modules
-from utils.collection_utils import datetime_parse
-
-
 def date_from_url(x):
       # Define regex pattern to get date from url
       pat = r"(20[0-2][0-9]([-_/]?)[0-9]{2}(?:\2[0-9]{2})?)"
       dates = re.compile(pat)
 
       res = dates.search(x)
-      res = datetime_parse(res[0])
+      date_parsed = datetime.strptime(res[0], '%Y/%m/%d')
 
-      return res[0]
+      return date_parsed
       
 def get_response(API_Link, pages=1):
       # Get re
@@ -36,7 +27,7 @@ def get_response(API_Link, pages=1):
         page_soup = soup(response.content, 'lxml')
         return page_soup
 
-def mit_searcher(API_Link, search_terms, days_back=7):
+def mit_searcher(API_Link, search_terms, scraped_times):
       # MIT defined topic tags to search
       topic_tags = ['artificial-intelligence', 'humans-and-technology', 'computing'] 
 
@@ -55,9 +46,6 @@ def mit_searcher(API_Link, search_terms, days_back=7):
             j_response = json.loads(response.text)
             # Just adding response in list, not appending list
             responses = responses + j_response
-      
-      # This df not needed anymore, but waiting to delete
-      # collected_df = pd.DataFrame(columns=['title', 'url', 'date', 'summary'])
 
       # Keys we need to extract from json
       needed_keys = ['title', 'permalink', 'postDate', 'excerpt']
@@ -72,17 +60,23 @@ def mit_searcher(API_Link, search_terms, days_back=7):
             entries.append(entry)      
 
       # Putting data in dataframe
-      new_df = pd.DataFrame(entries[1:],columns=entries[0])     
+      collected_df = pd.DataFrame(entries[1:],columns=entries[0])     
       
-      new_df['date'] = new_df['url'].apply(lambda x: date_from_url(x))
+      collected_df['date'] = collected_df['url'].apply(lambda x: date_from_url(x))
 
       # Getting list of texts with keywords therein
       relevant_text = []
       relevant_text.append(['title', 'url', 'date', 'summary', 'text'])
       
+      # Getting last collection time, if none, getting oldest date in results
+      try:
+            last_collected = datetime.strptime(scraped_times[base_url],'%Y-%m-%dT%H:%M:%SZ')
+      except:
+            last_collected = min(list(collected_df.date))
+
       # Gettin text and saving if our search terms appear in it
-      for index, row in new_df.iterrows():
-            if row.date >= today - timedelta(days_back):
+      for index, row in collected_df.iterrows():
+            if row.date > last_collected:
                   print('Fetching: ' + row.url)
                   response = requests.post(row.url)
                   html = soup(response.text, 'lxml')
@@ -122,15 +116,28 @@ def mit_searcher(API_Link, search_terms, days_back=7):
       else:
             new_df.to_csv(save_path, index=False)
 
+      # Saving collection time
+      scraped_times[base_url] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ') 
+      with open(IN_DATA_PATH + 'scraped_times.json', 'w', encoding='utf8') as f:
+            json.dump(scraped_times, f)
+
 if __name__ == '__main__':
-      # Paths, dir_path currently not needed
+      # Paths
       dir_path = path.dirname(path.realpath(__file__))
-      DATA_PATH = './data/'
-      IN_DATA_PATH = './data/input_data/'
-
-      # Getting today's date to compute how far back to collect      
-      today = datetime.now()
-
+      DATA_PATH = dir_path + '/data/'
+      IN_DATA_PATH = dir_path + '/data/input_data/'
+      
+      # Getting last collection date, if none initializing dictionary
+      try:
+            with open(IN_DATA_PATH + 'scraped_times.json') as f:
+                  scraped_times = json.load(f)     
+      except:
+            with open(IN_DATA_PATH + 'scraped_times.json', 'w', encoding='utf8') as f:
+                  init_dict = {}
+                  json.dump(init_dict, f)
+            with open(IN_DATA_PATH + 'scraped_times.json') as f:
+                  scraped_times = json.load(f)  
+      
       # Getting base url from json
       load_file = IN_DATA_PATH + 'collection_urls_dict.json'
       with open(load_file) as handle:
@@ -144,4 +151,4 @@ if __name__ == '__main__':
             search_terms = json.loads(handle.read())
 
       # Run
-      mit_searcher(API_Link, search_terms, days_back=7)
+      mit_searcher(API_Link, search_terms, scraped_times)

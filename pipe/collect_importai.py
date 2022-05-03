@@ -12,14 +12,7 @@ from os import listdir, path
 from os.path import isfile, join
 import os
 
-# prep for import of own scripts
-# #this only needs to be done because module not in same place as this pyimport sys
-sys.path.insert(0, '.')
-
-# Importing functions from our own modules
-from utils.collection_utils import datetime_parse
-
-def importai_searcher(base_url, search_terms, days_back=30):
+def importai_searcher(base_url, search_terms, scraped_times):
       # Lists for saving collected data
       title_list = []
       url_list = []
@@ -32,25 +25,35 @@ def importai_searcher(base_url, search_terms, days_back=30):
       # Getting the data we need
       objects = html.find_all('li', class_="campaign")
       for obj in objects:
-            print(obj.text)
-            print(obj.a['href'])
+            #print(obj.text)
+            #print(obj.a['href'])
             title_list.append(obj.text)
             url_list.append(obj.a['href'])
-            for item in title_list:
-                  date_sequence = datetime_parse(item)
-                  dates.append(date_sequence[0])
+      
+      for item in title_list:
+            date = item.split(' -')[0]
+            date_parsed = datetime.strptime(date, '%m/%d/%Y')
+            #print(date_parsed)
+            dates.append(date_parsed)
 
       # Saving to dataframe
       df_collected = pd.DataFrame(list(zip(title_list, url_list, dates)), 
             columns=['title', 'url', 'date'])           
-
+      
       # List to save next data and preping list for dictionary conversion
       relevant_text = []
       relevant_text.append(['title', 'url', 'date', 'text'])
+      
+      # Getting last collection time, if none, getting oldest date in results
+      try:
+            last_collected = datetime.strptime(scraped_times[base_url],'%Y-%m-%dT%H:%M:%SZ')
+      except:
+            last_collected = min(list(df_collected.date))
+            #print(last_collected)
 
       # Gets text for results within timedelta window
       for index, row in df_collected.iterrows():
-            if row.date >= today - timedelta(days_back):
+            if row.date > last_collected:
                   print('Fetching: ' + row.url)
                   response = requests.post(row.url)
 
@@ -89,15 +92,28 @@ def importai_searcher(base_url, search_terms, days_back=30):
             combined_df.to_csv(save_path, index=False)
       else:
             new_df.to_csv(save_path, index=False)
+     
+      # Saving collection time
+      scraped_times[base_url] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ') 
+      with open(IN_DATA_PATH + 'scraped_times.json', 'w', encoding='utf8') as f:
+            json.dump(scraped_times, f)
 
 if __name__ == '__main__':
-      # Paths, dir_path currently not needed
+      # Paths
       dir_path = path.dirname(path.realpath(__file__))
-      DATA_PATH = './data/'
-      IN_DATA_PATH = './data/input_data/'
+      DATA_PATH = dir_path + '/data/'
+      IN_DATA_PATH = dir_path + '/data/input_data/'
       
-      # Getting today's date to compute how far back to collect
-      today = datetime.now()
+      # Getting last collection date, if none initializing dictionary
+      try:
+            with open(IN_DATA_PATH + 'scraped_times.json') as f:
+                  scraped_times = json.load(f)     
+      except:
+            with open(IN_DATA_PATH + 'scraped_times.json', 'w', encoding='utf8') as f:
+                  init_dict = {}
+                  json.dump(init_dict, f)
+            with open(IN_DATA_PATH + 'scraped_times.json') as f:
+                  scraped_times = json.load(f)  
       
       # Getting base url from json
       load_file = IN_DATA_PATH + 'collection_urls_dict.json'
@@ -112,4 +128,4 @@ if __name__ == '__main__':
             search_terms = json.loads(handle.read())
 
       # Run
-      importai_searcher(base_url, search_terms, days_back=30)
+      importai_searcher(base_url, search_terms, scraped_times)

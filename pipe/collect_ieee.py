@@ -13,14 +13,14 @@ import lxml
 from fake_useragent import UserAgent
 
 # prep for import of own scripts
-# #this only needs to be done because module not in same place as this py
-import sys
-sys.path.insert(0, '.')
+# # #this only needs to be done because module not in same place as this py
+# import sys
+# sys.path.insert(0, '.')
 
-# Importing functions from our own modules
-from utils.collection_utils import datetime_parse
+# # Importing functions from our own modules
+# from utils.collection_utils import datetime_parse
 
-def ieee_searcher(base_url, search_terms, days_back=30):
+def ieee_searcher(base_url, search_terms, scraped_times0):
       '''
       Collects from IEEE spectrum using search terms
       Only returns first ~4 entries so must be run regularily
@@ -35,22 +35,21 @@ def ieee_searcher(base_url, search_terms, days_back=30):
       url_list = []
       date_list = []
 
+      # Setting up fake user agent to have a proper header
+      ua = UserAgent(verify_ssl=False, cache=False)
+      user_agent = ua.random
+      header = {'User-Agent': user_agent}
+      
       for term in search_terms['search_term']:
             
             # Putting together final url
             final_url = base_url + query_url + term + C + sort_criteria
             print(final_url)
 
-            # Setting up fake user agent to have a proper header
-            ua = UserAgent(verify_ssl=False, cache=False)
-            user_agent = ua.random
-            header = {'User-Agent': user_agent}
-
             # Making request and saving HTML of request
-            ######################
-            # TO DO - why am I posting? maybe just tired
-            ######################
-            response = requests.post(final_url, headers=header)
+            # earlier I used .post (instead of.get) 
+            # no clear reason why, but comment for the record
+            response = requests.get(final_url, headers=header)
             html = soup(response.text, 'lxml')
             
             #Getting all stories
@@ -64,30 +63,32 @@ def ieee_searcher(base_url, search_terms, days_back=30):
                   for i in items:
                         title_list.append(i.h2.text)
                         url_list.append(i.h2.a['href'])
-                        date = i.find_all('div', class_="social-date")
-                  
-                        for d in date:
-                              # Parsing date
-                              try: 
-                                    # Not working well
-                                    d_parsed = datetime_parse(d.text)
-                                    date_list.append(d_parsed[0])
-                              except:
-                                    date_list.append('None')
+
+                        date = i.find('div', class_="social-date")
+                        date = date.text.replace('\n', '')
+                        date_parsed = datetime.strptime(date, '%d %b %Y')
+
+                        print(date_parsed)
+                        date_list.append(date_parsed)
+
       # Putting lists in Dataframe                        
-      df_collected = pd.DataFrame(list(zip(title_list, url_list, date_list)), 
+      collected_df = pd.DataFrame(list(zip(title_list, url_list, date_list)), 
                   columns=['title', 'url', 'date',])      
       
-      # List to save text to
+      # List to save text to and preping for dictionary conversion
       relevant_text = []
-
-      # Preping above list fo dictionary conversion
       relevant_text.append(['title', 'url', 'date', 'text'])
-      
+
+      # Getting last collection time, if none, getting oldest date in results
+      try:
+            last_collected = datetime.strptime(scraped_times[base_url],'%Y-%m-%dT%H:%M:%SZ')
+      except:
+            last_collected = min(list(collected_df.date))
+
       # Looping through Dataframe to get text 
-      for index, row in df_collected.iterrows():
+      for index, row in collected_df.iterrows():
             # Only getting text from articles within timedelta = your search frequency
-            if row.date >= today - timedelta(days_back):
+            if row.date > last_collected:
                   print('Fetching: ' + row.url)
 
                   response = requests.post(row.url) #headers=header)
@@ -133,14 +134,27 @@ def ieee_searcher(base_url, search_terms, days_back=30):
       else:
             new_df.to_csv(save_path, index=False)
 
+      # Saving collection time
+      scraped_times[base_url] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ') 
+      with open(IN_DATA_PATH + 'scraped_times.json', 'w', encoding='utf8') as f:
+            json.dump(scraped_times, f)
+
 if __name__ == '__main__':
-      # Paths, dir_path currently not needed
+      # Paths
       dir_path = path.dirname(path.realpath(__file__))
-      DATA_PATH = './data/'
-      IN_DATA_PATH = './data/input_data/'
+      DATA_PATH = dir_path + '/data/'
+      IN_DATA_PATH = dir_path + '/data/input_data/'
       
-      # Getting today's date to compute how far back to collect
-      today = datetime.now()
+      # Getting last collection date, if none initializing dictionary
+      try:
+            with open(IN_DATA_PATH + 'scraped_times.json') as f:
+                  scraped_times = json.load(f)     
+      except:
+            with open(IN_DATA_PATH + 'scraped_times.json', 'w', encoding='utf8') as f:
+                  init_dict = {}
+                  json.dump(init_dict, f)
+            with open(IN_DATA_PATH + 'scraped_times.json') as f:
+                  scraped_times = json.load(f)  
 
       # Getting base url from json
       load_file = IN_DATA_PATH + 'collection_urls_dict.json'
@@ -154,4 +168,4 @@ if __name__ == '__main__':
             search_terms = json.loads(handle.read())
 
       # Run
-      ieee_searcher(base_url, search_terms, days_back=30)
+      ieee_searcher(base_url, search_terms, scraped_times)

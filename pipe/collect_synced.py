@@ -12,16 +12,6 @@ from datetime import datetime, timedelta
 import json
 import time
 
-# prep for import of own scripts
-# #this only needs to be done because module not in same place as this py
-import sys
-sys.path.insert(0, '.')
-
-# Importing functions from our own modules
-from utils_collection import datetime_parse
-#from itertools import combinations, permutations, chain
-
-
 def synced_searcher(base_url,search_terms, scraped_times):
       # Dates to build current url
       year = datetime.now().year
@@ -48,9 +38,10 @@ def synced_searcher(base_url,search_terms, scraped_times):
 
       dates = obj.find_all(class_='entry-date')
       for d in dates:
-            print(d)
-            d_parsed = datetime_parse(d.text)
-            date_list.append(d_parsed[0])
+            date = d.text.replace('\n', '')
+            date_parsed = datetime.strptime(date, '%Y-%m-%d')
+            print(date_parsed)
+            date_list.append(date_parsed)
 
       titles = obj.find_all(class_='entry-title')
       for t in titles:
@@ -77,7 +68,7 @@ def synced_searcher(base_url,search_terms, scraped_times):
 
       # Getting texts if date in range then checking for search terms      
       for index, row in df_collected.iterrows():
-            if row.date >= last_collected:
+            if row.date > last_collected:
                   print('Fetching: ' + row.url)
                   response = requests.post(row.url) #headers=header)
 
@@ -119,6 +110,11 @@ def synced_searcher(base_url,search_terms, scraped_times):
             combined_df.to_csv(save_path, index=False)
       else:
             new_df.to_csv(save_path, index=False)
+      
+      # Saving collection time
+      scraped_times[base_url] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ') 
+      with open(IN_DATA_PATH + 'scraped_times.json', 'w', encoding='utf8') as f:
+            json.dump(scraped_times, f)
 
 if __name__ == '__main__':
       # Paths
@@ -136,8 +132,6 @@ if __name__ == '__main__':
                   json.dump(init_dict, f)
             with open(IN_DATA_PATH + 'scraped_times.json') as f:
                   scraped_times = json.load(f)        
-      # Getting today's date to compute url and how far back to collect
-      #today = datetime.now()
 
       # Getting base url from json
       load_file = IN_DATA_PATH + 'collection_urls_dict.json'
