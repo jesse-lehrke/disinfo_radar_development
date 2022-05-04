@@ -25,17 +25,23 @@ def get_pdfs(DATA_PATH, QUERY, df):
       timeout_secs = 10 
 
       for index, row in df.iterrows():
-            #if row.date >= datetime.now() - timedelta(days=14):
-
-            basename = row.url.split('/')[-1]
-            basename = basename.split('.')[0]
+            if type(row.url) is list:
+                  # this is only for arXiv - edit as new list formats needed
+                  for item in row.url:
+                        if item['type'] == 'application/pdf':
+                              pdf_url = item['href']
+                              basename = pdf_url.split('/')[-1]
+            else:
+                  basename = row.url.split('/')[-1]
+                  basename = basename.split('.')[0]
+                  pdf_url = row.urlopen
+            
             fname = os.path.join(pdf_dir, basename + '.pdf')
             print(fname)
 
-            # try:
             if not basename in have:
-                  print('fetching %s into %s' % (row.url, fname))
-                  clean_url = row.url.replace(" ", "%20")
+                  print('fetching %s into %s' % (pdf_url, fname))
+                  clean_url = pdf_url.replace(" ", "%20")
                   req = urlopen(clean_url, None, timeout_secs)
                   with open(fname, 'wb') as fp:
                         shutil.copyfileobj(req, fp)
@@ -100,8 +106,8 @@ def text_to_csv(DATA_PATH, QUERY):
       #df_temp = pd.DataFrame(results)
 
       # !!! WARNING - DELETE DIR
-      shutil.rmtree(txt_dir)
-      shutil.rmtree(pdf_dir)
+      #shutil.rmtree(txt_dir)
+      #shutil.rmtree(pdf_dir)
 
       return results
 
@@ -125,7 +131,7 @@ def bulk_pdf_to_text(DATA_PATH, QUERY):
                         print("Processing " + path_to_pdf)
                         pdf_contents = parser.from_file(path_to_pdf)
                         
-                        txt_basename = file.split('.')[0]
+                        txt_basename = file.split('.pdf')[0]
                         print(txt_dir)
                         print(txt_basename)
                         path_to_txt = os.path.join(txt_dir, txt_basename)

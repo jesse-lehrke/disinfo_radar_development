@@ -7,6 +7,8 @@
 *password*
 *.httr-oauth*
 
+pipe/credentials/
+pipe/data/
 # Data folders
 data/
 documentation/

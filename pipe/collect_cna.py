@@ -22,15 +22,23 @@ import json
 # Importing functions from our own modules
 from utils_conversion import get_pdfs, pdf_to_text, text_to_csv, bulk_pdf_to_text
 
-def cna_searcher(base_url, scraped_times):
+# Paths
+dir_path = path.dirname(path.realpath(__file__))
+DATA_PATH = dir_path + '/data/'
+IN_DATA_PATH = dir_path + '/data/input_data/'
+
+def cna_searcher(base_url, scraped_times, search_terms):
       '''
-      Currently gets all issues from CNA
-      TO DO: add date functionality
+      Doc string here
       '''
       # Create fake user agent
       ua = UserAgent(verify_ssl=False, cache=False)
       user_agent = ua.random
       header = {'User-Agent': user_agent}
+      
+      # This can help get through some security
+      # Have not used everywhere, but no reason you cannot      
+      ssl._create_default_https_context = ssl._create_unverified_context
 
       response = requests.get(base_url, headers=header)
 
@@ -66,26 +74,22 @@ def cna_searcher(base_url, scraped_times):
             last_collected = min(list(df_collected.date))
       
       # Filtering dates here, could be done after collection but would need good reason
-      new_df = df_collected[df_collected.date > last_collected]
+      new_df = df_collected[df_collected.date >= last_collected]
       
       # PDF Work
       QUERY = 'CNA' # should we seperate Russia and China?
 
-      # consider another subfolder then change PATHs
-      get_pdfs(DATA_PATH, QUERY, df_collected)
+      get_pdfs(DATA_PATH, QUERY, new_df)
       
       bulk_pdf_to_text(DATA_PATH, QUERY)
       #pdf_to_text(DATA_PATH, QUERY)
       
       df_temp = text_to_csv(DATA_PATH, QUERY)
 
-      #new_df = df_collected[df_collected['date'] >= datetime.now() - timedelta(days=60)]
-
       #try:
       new_df['text'] = df_temp
-      #new_df = pd.merge(df_collected, df_temp, on='title', how='outer')
       
-      save_path = DATA_PATH + 'cna_' + QUERY + '_data.csv'
+      save_path = DATA_PATH + 'cna' + '_data.csv'
       
       if path.isfile(save_path):
             old_df = pd.read_csv(save_path)
@@ -100,7 +104,7 @@ def cna_searcher(base_url, scraped_times):
       # Saving collection time
       scraped_times[base_url] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ') 
       with open(IN_DATA_PATH + 'scraped_times.json', 'w', encoding='utf8') as f:
-            json.dump(scraped_times, f)
+            json.dump(scraped_times, f, indent=2, ensure_ascii=False)
 
       # TO DO Should we filter for keywords then? Or want it all?
 
@@ -131,13 +135,9 @@ if __name__ == '__main__':
       base_url_2 = sources['CNA_China']
 
       # NOT YET NEEDED
-      # load_file = IN_DATA_PATH + 'collection_searchterms.json'
-      # with open(load_file) as handle:
-      #       search_terms = json.loads(handle.read())
+      load_file = IN_DATA_PATH + 'collection_searchterms.json'
+      with open(load_file) as handle:
+            search_terms = json.loads(handle.read())
 
-      # This can help get through some security
-      # Have not used everywhere, but no reason you cannot
-      ssl._create_default_https_context = ssl._create_unverified_context
-
-      cna_searcher(base_url_1, scraped_times)
-      #cna_searcher(base_url_2, scraped_times)
+      cna_searcher(base_url_1, scraped_times, search_terms)
+      cna_searcher(base_url_2, scraped_times, search_terms)

@@ -12,15 +12,12 @@ from bs4 import BeautifulSoup as soup
 import lxml
 from fake_useragent import UserAgent
 
-# prep for import of own scripts
-# # #this only needs to be done because module not in same place as this py
-# import sys
-# sys.path.insert(0, '.')
+# Paths
+dir_path = path.dirname(path.realpath(__file__))
+DATA_PATH = dir_path + '/data/'
+IN_DATA_PATH = dir_path + '/data/input_data/'
 
-# # Importing functions from our own modules
-# from utils.collection_utils import datetime_parse
-
-def ieee_searcher(base_url, search_terms, scraped_times0):
+def ieee_searcher(base_url, search_terms, scraped_times):
       '''
       Collects from IEEE spectrum using search terms
       Only returns first ~4 entries so must be run regularily
@@ -137,7 +134,7 @@ def ieee_searcher(base_url, search_terms, scraped_times0):
       # Saving collection time
       scraped_times[base_url] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ') 
       with open(IN_DATA_PATH + 'scraped_times.json', 'w', encoding='utf8') as f:
-            json.dump(scraped_times, f)
+            json.dump(scraped_times, f, indent=2, ensure_ascii=False)
 
 if __name__ == '__main__':
       # Paths

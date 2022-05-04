@@ -12,6 +12,11 @@ from datetime import datetime, timedelta
 import json
 import time
 
+# Paths
+dir_path = path.dirname(path.realpath(__file__))
+DATA_PATH = dir_path + '/data/'
+IN_DATA_PATH = dir_path + '/data/input_data/'
+
 def synced_searcher(base_url,search_terms, scraped_times):
       # Dates to build current url
       year = datetime.now().year
@@ -114,7 +119,7 @@ def synced_searcher(base_url,search_terms, scraped_times):
       # Saving collection time
       scraped_times[base_url] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ') 
       with open(IN_DATA_PATH + 'scraped_times.json', 'w', encoding='utf8') as f:
-            json.dump(scraped_times, f)
+            json.dump(scraped_times, f, indent=2, ensure_ascii=False)
 
 if __name__ == '__main__':
       # Paths

@@ -1,23 +1,32 @@
 from parsel import Selector
 import requests, json, os
+from os import path
 
+# Paths
+dir_path = path.dirname(path.realpath(__file__))
+DATA_PATH = dir_path + '/data/'
+IN_DATA_PATH = dir_path + '/data/input_data/'
+OUTPUT_PATH = dir_path + '/data/raw/'
 
 def check_sources(source: list or str):
     if isinstance(source, str):
-        return source                                             # NIPS
+        return source                                             
     elif isinstance(source, list):
-        return " OR ".join([f'source:{item}' for item in source]) # source:NIPS OR source:Neural Information
+        return " OR ".join([f'source:{item}' for item in source]) 
 
 
-def scrape_conference_publications(query: str, source: list or str):
-    # https://docs.python-requests.org/en/master/user/quickstart/#passing-parameters-in-urls
+def scrape_google_scholar(query: str, source: list or str):
     params = {
         "q": f'{query.lower()} {check_sources(source=source)}',  # search query
-        "hl": "en",                         # language of the search
-        "gl": "us"                          # country of the search
+        "hl": "en",             # language of the search
+        "gl": "us",             # country of the search
+        "as_ylo": 2022,         # start date
+        "as_yhi": 2022,         # end date
+        "scisbd": 1             # sort by date
+        #"start": 10            # for pagination, NOT IMPLEMENTED                
     }
 
-    # https://docs.python-requests.org/en/master/user/quickstart/#custom-headers
+    #REPLACE
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36"
     }
@@ -55,8 +64,15 @@ def scrape_conference_publications(query: str, source: list or str):
         })
 
     # return publications
+    save_as = 'google_scholar_data'
 
-    print(json.dumps(publications, indent=2, ensure_ascii=False))
+    file = OUTPUT_PATH + save_as + '.jsonl'
+
+    with open (file, 'a') as f:
+            json.dump(publications, f, indent=2, ensure_ascii=False) # use raw as __dict__ has raw in it, thus more data
+            f.write('\n')
+
+    #print(json.dumps(publications, indent=2, ensure_ascii=False))
 
 
-scrape_conference_publications(query="anatomy", source=["NIPS", "Neural Information"])
+scrape_google_scholar(query="generative adversarial network", source=None)#["NIPS", "Neural Information"] #"hindawi"
