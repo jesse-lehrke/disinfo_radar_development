@@ -1,6 +1,33 @@
 import re
 from itertools import combinations, permutations, chain
 from datetime import datetime, timedelta
+from bs4 import BeautifulSoup as soup
+
+def split_article_on(objects, tag, txt):
+      '''
+      Splits a full text article on a list of seperators
+      objects = the html/soup object
+      tag = the seperator tag
+      txt= the full text
+      '''
+      header_list_sub = []
+      headers = objects.find_all(tag) # strong
+
+      #TO DO: add functionality to do on a String
+
+      for head in headers:
+            if head.text == '':
+                  pass
+            else:
+                  header_list_sub.append(head.text)    
+      
+      default_sep = header_list_sub[0]
+
+      # we skip seps[0] because that's the default separator
+      for sep in header_list_sub[1:]:
+            txt = txt.replace(sep, default_sep)
+      split_text = [i.strip() for i in txt.split(default_sep)]
+      return split_text, header_list_sub
 
 def aggragate(df, group_on, column):
       '''

@@ -8,6 +8,7 @@ from utils_notifications import send_notification
 
 from os import listdir, path
 import json
+import traceback
 
 if __name__ == '__main__':
       dir_path = path.dirname(path.realpath(__file__))
@@ -35,8 +36,16 @@ if __name__ == '__main__':
       load_file = IN_DATA_PATH + 'collection_urls_dict_v2.json'
       with open(load_file) as handle:
             sources = json.loads(handle.read())
-      
-      # Option 1: getting all sources by calling dictionary
+
+      # TO DO - add arXiv
+      try:
+            arxiv_searcher(100, search_terms, scraped_times)
+      except Exception as e:
+            print("Scraping failed for ", 'arXiv')
+            print(e)
+            send_notification("Scraping failed for " + 'arXiv' + '\n' + str(e) + '\n' + traceback.format_exc())
+
+      # Getting all sources by calling dictionary
       for key, value in sources.items():
             try:
                   key2 = eval(key)
@@ -44,16 +53,6 @@ if __name__ == '__main__':
                   print('Done')
             except Exception as e:
                   print("Scraping failed for ", sources[key])
-                  print(e)            
-                  send_notification("Scraping failed for " + sources[key] + '\n' + str(e))
+                  print(e)
+                  send_notification("Scraping failed for " + sources[key] + '\n' + str(e) + '\n' + traceback.format_exc())
 
-      # TO DO - add arXiv
-
-      ## Option 2 : one of the following for every imported module
-      # Run 1
-      # try:
-      #       importai_searcher(sources['Import_AI'], search_terms, scraped_times)
-      #       print('Done')
-      # except Exception as e:
-      #       print("Scraping failed for ", sources['Import_AI'])
-      #       print(e)

@@ -34,7 +34,7 @@ def get_pdfs(DATA_PATH, QUERY, df):
             else:
                   basename = row.url.split('/')[-1]
                   basename = basename.split('.')[0]
-                  pdf_url = row.urlopen
+                  pdf_url = row.url
             
             fname = os.path.join(pdf_dir, basename + '.pdf')
             print(fname)
@@ -106,8 +106,8 @@ def text_to_csv(DATA_PATH, QUERY):
       #df_temp = pd.DataFrame(results)
 
       # !!! WARNING - DELETE DIR
-      #shutil.rmtree(txt_dir)
-      #shutil.rmtree(pdf_dir)
+      shutil.rmtree(txt_dir)
+      shutil.rmtree(pdf_dir)
 
       return results
 

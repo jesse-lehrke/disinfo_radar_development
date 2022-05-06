@@ -24,7 +24,7 @@ MODEL_PATH = dir_path + '/data/models/'
 
 # load test_compiled.csv
 # Load dataframe
-filename = 'test_compiled.csv'
+filename = 'daily_compiled.csv'
 CONVERTERS = {'tokens': eval}
 
 df = pd.read_csv(DATA_PATH + filename, converters=CONVERTERS)
@@ -79,7 +79,7 @@ print(Counter(categories))
 #       row_data = [' '.join(row.tokens)]
 
 #       # Note different from other models here with .toarray
-#       transformed_row = selector.transform(vectorizer.transform(row_data)).toarray()
+#       transformed_row = vectorizer.transform(row_data).toarray()
       
 #       predicted = sig_model.predict(transformed_row)
 #       predicted_proba = sig_model.predict_proba(transformed_row)

@@ -129,7 +129,7 @@ if __name__ == '__main__':
 
       # TO-DO: Move to json and load 
       # But first ? Do we need it? I recommend this be our search_terms...maybe, thus load here
-      to_keep = ["GAN", "GPT-3", "fake news", "disinformation"]
+      to_keep = []
 
       onlyfiles = [f for f in listdir(DATA_PATH) if isfile(join(DATA_PATH, f))]
 

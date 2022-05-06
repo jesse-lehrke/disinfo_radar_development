@@ -28,9 +28,9 @@ def date_from_url(x):
       
 def get_response(API_Link, pages=1):
       # Get re
-    with requests.get(API_Link + '&page=' + str(pages)) as response:
-        page_soup = soup(response.content, 'lxml')
-        return page_soup
+      with requests.get(API_Link + '&page=' + str(pages)) as response:
+            page_soup = soup(response.content, 'lxml')
+            return page_soup
 
 def mit_searcher(API_Link, search_terms, scraped_times):
       # MIT defined topic tags to search
@@ -75,7 +75,7 @@ def mit_searcher(API_Link, search_terms, scraped_times):
       
       # Getting last collection time, if none, getting oldest date in results
       try:
-            last_collected = datetime.strptime(scraped_times[base_url],'%Y-%m-%dT%H:%M:%SZ')
+            last_collected = datetime.strptime(scraped_times[API_Link],'%Y-%m-%dT%H:%M:%SZ')
       except:
             last_collected = min(list(collected_df.date))
 
@@ -122,7 +122,7 @@ def mit_searcher(API_Link, search_terms, scraped_times):
             new_df.to_csv(save_path, index=False)
 
       # Saving collection time
-      scraped_times[base_url] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ') 
+      scraped_times[API_Link] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ') 
       with open(IN_DATA_PATH + 'scraped_times.json', 'w', encoding='utf8') as f:
             json.dump(scraped_times, f, indent=2, ensure_ascii=False)
 
