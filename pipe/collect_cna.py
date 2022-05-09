@@ -22,7 +22,7 @@ from utils_collection import split_article_on
 
 # Paths
 dir_path = path.dirname(path.realpath(__file__))
-DATA_PATH = dir_path + '/data/'
+DATA_PATH = dir_path + '/data/running/'
 IN_DATA_PATH = dir_path + '/data/input_data/'
 
 def cna_searcher(base_url, scraped_times, search_terms):
@@ -103,10 +103,6 @@ def cna_searcher(base_url, scraped_times, search_terms):
                   articles, header_list_sub = split_article_on(objects, 'h4', full_text)
             else:
                   articles, header_list_sub = split_article_on(objects, 'strong', full_text)
-            
-            # First section has no "header" so adding one to equalized list lengths
-            while len(header_list_sub) != len(articles):
-                  header_list_sub.insert(0, 'Intro (no tag)')
 
             # Creating unique title using issue and section "header"
             header_list_sub = [title + ' - ' + head for head in header_list_sub]
@@ -143,8 +139,6 @@ def cna_searcher(base_url, scraped_times, search_terms):
             combined_df.to_csv(save_path, index=False)
       else:
             new_df.to_csv(save_path, index=False)
-      # except:
-      #       print('No new PDFs')
 
       # Saving collection time
       scraped_times[base_url] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ') 
@@ -156,7 +150,7 @@ def cna_searcher(base_url, scraped_times, search_terms):
 if __name__ == '__main__':
       # Paths
       dir_path = path.dirname(path.realpath(__file__))
-      DATA_PATH = dir_path + '/data/'
+      DATA_PATH = dir_path + '/data/running/'
       IN_DATA_PATH = dir_path + '/data/input_data/'
       
       # Getting last collection date, if none initializing dictionary
@@ -184,5 +178,5 @@ if __name__ == '__main__':
       with open(load_file) as handle:
             search_terms = json.loads(handle.read())
 
-      cna_searcher(base_url_1, scraped_times, search_terms)
+      #cna_searcher(base_url_1, scraped_times, search_terms)
       cna_searcher(base_url_2, scraped_times, search_terms)

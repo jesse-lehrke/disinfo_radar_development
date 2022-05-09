@@ -1,7 +1,9 @@
 import pandas as pd
 
+import os
 from os.path import isfile, join
 from os import listdir, path
+from datetime import datetime
 
 import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
@@ -9,6 +11,8 @@ from nltk.corpus import stopwords
 import string
 import spacy
 import re
+
+import shutil
 
 # INSTALL FIRST:
 # nltk.download('stopwords')
@@ -46,7 +50,9 @@ def remove_punctuation(txt):
       return txt_nopunct
 
 def lemmatization(texts, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV']):
-      """https://spacy.io/api/annotation"""
+      '''For all possile tags see https://github.com/explosion/spaCy/blob/master/spacy/glossary.py
+      which is based on https://universaldependencies.org/u/pos/
+      '''
       doc = nlp("".join(texts)) #nlp(sent) #" ".join(sent)) 
       texts_out = [token.lemma_ for token in doc if token.pos_ in allowed_postags or token.text in to_keep]
       return texts_out
@@ -100,30 +106,27 @@ def pre_process(df, key, action_col = 'text', filetype = 'csv', load = False):
       df['tokens'] = df['processing'].dropna().apply(lambda x:  remove_stopwords(x))
       
       df.drop(columns=['processing'], inplace=True)
+      df.dropna(subset='tokens', inplace=True)
       
       # Not needed, if used make a try-except clause
       #df['category'] = df['tags'].dropna().apply(lambda x:  get_tag(x))
       
-      # Saving, as new if not exists, concating if file exists already
-      #ATTN - IMO do not want to do this! Just save, only merge the archives
+      # Saving, overwriting existing, and archiving 
       save_path = OUTPUT_PATH + key + '.csv'
-      
-      if path.isfile(save_path):
-            old_df = pd.read_csv(save_path)
-            combined_df = pd.concat([df, old_df])
-            combined_df.drop_duplicates(subset='links', inplace=True)
-            combined_df.to_csv(save_path, index=False)
-      else:
-            df.to_csv(save_path, index=False)
-            
+      archive_path = ARCHIVE_PATH + key + '_' + str(datetime.now()) + '.csv'
+
+      df.to_csv(save_path, index=False)
+      df.to_csv(archive_path, index=False)
+           
       return df
 
 if __name__ == '__main__':
       # Paths
       dir_path = path.dirname(path.realpath(__file__))
-      DATA_PATH = dir_path + '/data/'
+      DATA_PATH = dir_path + '/data/running/' #running
       IN_DATA_PATH = dir_path + '/data/input_data/'
       OUTPUT_PATH = dir_path + '/data/final/'
+      ARCHIVE_PATH = dir_path + '/data/archive/'
 
       nlp = spacy.load("en_core_web_sm") # disable=['parser', 'ner']) ## if you need efficiency
 
@@ -153,6 +156,18 @@ if __name__ == '__main__':
       # Get new dfs in new dictionary, merge and export
       df_compiled = pd.concat([v for k,v in dataframe.items()])
       # May prefer to send to a seperate analysis folder
-      df_compiled.to_csv(OUTPUT_PATH + 'daily_compiled.csv', index=False)
+      df_compiled.to_csv(OUTPUT_PATH + 'compiled.csv', index=False)
       
-      # REMINDER, archive this before overwriting, and yes, I prefer overwriting
+      # Archiving full collection, concated with existing
+      full_archive_path = ARCHIVE_PATH + 'compiled.csv'
+
+      if path.isfile(full_archive_path):
+            old_df = pd.read_csv(full_archive_path)
+            combined_df = pd.concat([df_compiled, old_df])
+            combined_df.to_csv(full_archive_path, index=False)
+      else:
+            df_compiled.to_csv(full_archive_path, index=False)
+      
+      # Deleting running data and making fresh folder for next iteration
+      shutil.rmtree(DATA_PATH)
+      os.makedirs(DATA_PATH)

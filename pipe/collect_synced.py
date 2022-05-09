@@ -14,14 +14,15 @@ import time
 
 # Paths
 dir_path = path.dirname(path.realpath(__file__))
-DATA_PATH = dir_path + '/data/'
+DATA_PATH = dir_path + '/data/running/'
 IN_DATA_PATH = dir_path + '/data/input_data/'
 
-def synced_searcher(base_url,search_terms, scraped_times):
+def synced_searcher(base_url, search_terms, scraped_times):
       # Dates to build current url
       year = datetime.now().year
       month = datetime.now().month
       current_url = base_url + str(year) + '/' +  str(month) + '/'
+      print(current_url)
 
       # lists for saving
       title_list = []
@@ -71,7 +72,7 @@ def synced_searcher(base_url,search_terms, scraped_times):
       except:
             last_collected = min(list(df_collected.date))
 
-      # Getting texts if date in range then checking for search terms      
+      # Getting texts if newer than last collected      
       for index, row in df_collected.iterrows():
             if row.date > last_collected:
                   print('Fetching: ' + row.url)
@@ -87,16 +88,10 @@ def synced_searcher(base_url,search_terms, scraped_times):
                               article_text.append(p.text)
 
                   article_text = ' '.join(article_text)
-
-                  for word in search_terms['search_term']:
-                        if word in article_text:
-                              save = list(row)
-                              save.append(article_text)
-                              relevant_text.append(save)                  
-                              print('Search term found: ' +  word)
-                              break
-                  else: 
-                        pass
+                  
+                  save = list(row)
+                  save.append(article_text)
+                  relevant_text.append(save)   
 
                   time.sleep(5)
             else:
@@ -124,7 +119,7 @@ def synced_searcher(base_url,search_terms, scraped_times):
 if __name__ == '__main__':
       # Paths
       dir_path = path.dirname(path.realpath(__file__))
-      DATA_PATH = dir_path + '/data/'
+      DATA_PATH = dir_path + '/data/running/'
       IN_DATA_PATH = dir_path + '/data/input_data/'
       
       # Getting last collection date, if none initializing dictionary
@@ -139,13 +134,13 @@ if __name__ == '__main__':
                   scraped_times = json.load(f)        
 
       # Getting base url from json
-      load_file = IN_DATA_PATH + 'collection_urls_dict.json'
+      load_file = IN_DATA_PATH + 'collection_urls_dict_v2.json'
 
       with open(load_file) as handle:
             sources = json.loads(handle.read())
       
-      base_url = sources['Synced']
-
+      base_url = sources['synced_searcher']
+      print(base_url)
       # Getting search terms from json
       load_file = IN_DATA_PATH + 'collection_searchterms.json'
 

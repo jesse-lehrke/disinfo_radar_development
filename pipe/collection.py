@@ -12,7 +12,7 @@ import traceback
 
 if __name__ == '__main__':
       dir_path = path.dirname(path.realpath(__file__))
-      DATA_PATH = dir_path + '/data/'
+      DATA_PATH = dir_path + '/data/running/'
       IN_DATA_PATH = dir_path + '/data/input_data/'
       OUTPUT_PATH = dir_path + '/data/raw/'
 
@@ -39,7 +39,7 @@ if __name__ == '__main__':
 
       # TO DO - add arXiv
       try:
-            arxiv_searcher(100, search_terms, scraped_times)
+            arxiv_searcher(10, search_terms, scraped_times)
       except Exception as e:
             print("Scraping failed for ", 'arXiv')
             print(e)

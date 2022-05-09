@@ -3,31 +3,52 @@ from itertools import combinations, permutations, chain
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup as soup
 
-def split_article_on(objects, tag, txt):
+def split_article_on(objects, tag, txt, string_sep=None, parse=True):
       '''
       Splits a full text article on a list of seperators
       objects = the html/soup object
       tag = the seperator tag
       txt= the full text
+      parse = set to False to disable this function
+      string_sep = a string to split on,
+                  this currently looks if string appears 5x or more
+                  see line 21 to change
+                  "objects" is not needed in this case, but keeping for uniformity
+      TO DO: add functionality to do on a String
       '''
-      header_list_sub = []
-      headers = objects.find_all(tag) # strong
+      if parse == False:
+            header_list_sub = ['(not parsed']
+            return txt, header_list_sub
+      else:
+            header_list_sub = []
+            if string_sep is not None:
+                  print('String seperator found')
+                  header_list_sub = re.findall(string_sep + '{5,}', txt)
 
-      #TO DO: add functionality to do on a String
-
-      for head in headers:
-            if head.text == '':
-                  pass
             else:
-                  header_list_sub.append(head.text)    
-      
-      default_sep = header_list_sub[0]
+                  header_list_sub = []
+                  headers = objects.find_all(tag) 
 
-      # we skip seps[0] because that's the default separator
-      for sep in header_list_sub[1:]:
-            txt = txt.replace(sep, default_sep)
-      split_text = [i.strip() for i in txt.split(default_sep)]
-      return split_text, header_list_sub
+                  for head in headers:
+                        if head.text == '':
+                              pass
+                        else:
+                              header_list_sub.append(head.text)    
+            
+            default_sep = header_list_sub[0]
+
+            # we skip seps[0] because that's the default separator
+            for sep in header_list_sub[1:]:
+                  txt = txt.replace(sep, default_sep)
+            split_text = [i.strip() for i in txt.split(default_sep)]
+
+            # First section has no "header" so adding one to equalized list lengths            
+            while len(header_list_sub) != len(split_text):
+                  header_list_sub.insert(0, 'Intro (no tag)')
+
+            split_text = [str(x[0]) + x[1] + x[2] for x in zip(header_list_sub, list(' ' * len(split_text)), split_text)]
+
+            return split_text, header_list_sub
 
 def aggragate(df, group_on, column):
       '''

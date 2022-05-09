@@ -13,7 +13,7 @@ import time
 
 # Paths
 dir_path = path.dirname(path.realpath(__file__))
-DATA_PATH = dir_path + '/data/'
+DATA_PATH = dir_path + '/data/running/'
 IN_DATA_PATH = dir_path + '/data/input_data/'
 
 def date_from_url(x):
@@ -79,7 +79,7 @@ def mit_searcher(API_Link, search_terms, scraped_times):
       except:
             last_collected = min(list(collected_df.date))
 
-      # Gettin text and saving if our search terms appear in it
+      # Gettin text and saving if newer than last collected
       for index, row in collected_df.iterrows():
             if row.date > last_collected:
                   print('Fetching: ' + row.url)
@@ -93,16 +93,10 @@ def mit_searcher(API_Link, search_terms, scraped_times):
                         for p in paragraph_text:
                               article_text.append(p.text)
                   article_text = ' '.join(article_text)
-
-                  for word in search_terms['search_term']:
-                        if word in article_text:
-                              save = list(row)
-                              save.append(article_text)
-                              relevant_text.append(save)                  
-                              print('Search term found: ' +  word)
-                              break
-                  else: 
-                        pass
+                  
+                  save = list(row)
+                  save.append(article_text)
+                  relevant_text.append(save)  
 
                   time.sleep(5)
             else:
@@ -129,7 +123,7 @@ def mit_searcher(API_Link, search_terms, scraped_times):
 if __name__ == '__main__':
       # Paths
       dir_path = path.dirname(path.realpath(__file__))
-      DATA_PATH = dir_path + '/data/'
+      DATA_PATH = dir_path + '/data/running/'
       IN_DATA_PATH = dir_path + '/data/input_data/'
       
       # Getting last collection date, if none initializing dictionary

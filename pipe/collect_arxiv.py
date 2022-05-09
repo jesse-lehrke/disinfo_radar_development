@@ -11,7 +11,7 @@ from utils_conversion import get_pdfs, bulk_pdf_to_text, text_to_csv
 
 # Paths
 dir_path = path.dirname(path.realpath(__file__))
-DATA_PATH = dir_path + '/data/'
+DATA_PATH = dir_path + '/data/running/'
 IN_DATA_PATH = dir_path + '/data/input_data/'
 OUTPUT_PATH = dir_path + '/data/raw/'
 
@@ -114,7 +114,7 @@ def arxiv_searcher(results, search_terms, scraped_times):
 if __name__ == '__main__':
       # Paths
       dir_path = path.dirname(path.realpath(__file__))
-      DATA_PATH = dir_path + '/data/'
+      DATA_PATH = dir_path + '/data/running/'
       IN_DATA_PATH = dir_path + '/data/input_data/'
       OUTPUT_PATH = dir_path + '/data/raw/'
 
@@ -134,10 +134,7 @@ if __name__ == '__main__':
       with open(load_file) as handle:
             search_terms = json.loads(handle.read())
 
-      ### keyword list we can mix into the final dataframe
-      #keywords = search_terms['search_term']
-
-      arxiv_searcher(100, search_terms, scraped_times)
+      arxiv_searcher(5, search_terms, scraped_times)
 
 
 

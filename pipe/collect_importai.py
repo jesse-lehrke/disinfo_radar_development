@@ -12,9 +12,11 @@ from os import listdir, path
 from os.path import isfile, join
 import os
 
+from utils_collection import split_article_on
+
 # Paths
 dir_path = path.dirname(path.realpath(__file__))
-DATA_PATH = dir_path + '/data/'
+DATA_PATH = dir_path + '/data/running/'
 IN_DATA_PATH = dir_path + '/data/input_data/'
 
 def importai_searcher(base_url, search_terms, scraped_times):
@@ -44,48 +46,89 @@ def importai_searcher(base_url, search_terms, scraped_times):
       # Saving to dataframe
       df_collected = pd.DataFrame(list(zip(title_list, url_list, dates)), 
             columns=['title', 'url', 'date'])           
+      print(len(df_collected))
       
       # List to save next data and preping list for dictionary conversion
-      relevant_text = []
-      relevant_text.append(['title', 'url', 'date', 'text'])
+      #relevant_text = []
+      #relevant_text.append(['title', 'url', 'date', 'text'])
       
       # Getting last collection time, if none, getting oldest date in results
       try:
             last_collected = datetime.strptime(scraped_times[base_url],'%Y-%m-%dT%H:%M:%SZ')
       except:
             last_collected = min(list(df_collected.date))
-            #print(last_collected)
+      print(last_collected)
 
-      # Gets text for results within timedelta window
-      for index, row in df_collected.iterrows():
-            if row.date > last_collected:
-                  print('Fetching: ' + row.url)
-                  response = requests.post(row.url)
-
-                  html = soup(response.text, 'lxml')
-
-                  objects = html.find_all('p')#, class_="campaign")
-                  issue_text = []
-                  for obj in objects:
-                        issue_text.append(obj.text)
-                  issue_text = ' '.join(issue_text)
-
-                  # Saving that text only if our search term appears in it                  
-                  for word in search_terms['search_term']:
-                        if word in issue_text:
-                              save = list(row)
-                              save.append(issue_text)
-                              relevant_text.append(save)                  
-                              print('Search term found: ' +  word)
-                              break
-                        else: 
-                              pass
-                  time.sleep(5)
-            else:
-                  pass
+      ###### HERE
+      # Filtering dates here, could be done after collection but would need good reason
+      new_df = df_collected[df_collected.date >= last_collected]
       
-      # Final dataframe
-      new_df = pd.DataFrame(relevant_text[1:],columns=relevant_text[0])
+      article_list = []
+      date_list = []
+      header_list = []     
+      url_list = []      
+
+      # Gets text for results newer than last collected
+      for index, row in new_df.iterrows():
+            print('Fetching: ' + row.url)
+            response = requests.post(row.url)
+
+            html = soup(response.text, 'lxml')
+
+            objects = html.find_all('p')#, class_="campaign")
+            issue_text = []
+            for obj in objects:
+                  issue_text.append(obj.text)
+            issue_text = ' '.join(issue_text)
+            
+            import itertools
+
+            objects_joined = [o.append for o in objects]
+            articles, header_list_sub = split_article_on(objects_joined[0], 'strong', issue_text, string_sep='#')
+
+            # Creating unique title using issue and section "header", using index for string seperated texts
+            header_list_sub = [row.title + ' - ' + str(ind) for ind, head in enumerate(header_list_sub)]
+
+            print(header_list_sub)
+
+            # Append main lists
+            article_list.extend(articles)
+            header_list.extend(header_list_sub)            
+            date_list.extend([row.date] * len(articles))
+            url_list.extend([row.url] * len(articles))
+            
+            time.sleep(5)
+
+      new_df = pd.DataFrame(list(zip(header_list, url_list, date_list, article_list)), 
+            columns=['title', 'url', 'date', 'text'])       
+
+      print(len(new_df))
+      # #####TO HERE
+
+      # # Gets text for results newer than last collected
+      # for index, row in df_collected.iterrows():
+      #       if row.date > last_collected:
+      #             print('Fetching: ' + row.url)
+      #             response = requests.post(row.url)
+
+      #             html = soup(response.text, 'lxml')
+
+      #             objects = html.find_all('p')#, class_="campaign")
+      #             issue_text = []
+      #             for obj in objects:
+      #                   issue_text.append(obj.text)
+      #             issue_text = ' '.join(issue_text)
+                  
+      #             save = list(row)
+      #             save.append(issue_text)
+      #             relevant_text.append(save) 
+                  
+      #             time.sleep(5)
+      #       else:
+      #             pass
+      
+      # # Final dataframe
+      # new_df = pd.DataFrame(relevant_text[1:],columns=relevant_text[0])
       
       # Saving, as new if not exists, concating if file exists already
       save_path = DATA_PATH + 'importai_data.csv'
@@ -106,7 +149,7 @@ def importai_searcher(base_url, search_terms, scraped_times):
 if __name__ == '__main__':
       # Paths
       dir_path = path.dirname(path.realpath(__file__))
-      DATA_PATH = dir_path + '/data/'
+      DATA_PATH = dir_path + '/data/running/'
       IN_DATA_PATH = dir_path + '/data/input_data/'
       
       # Getting last collection date, if none initializing dictionary

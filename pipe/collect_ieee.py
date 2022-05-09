@@ -14,12 +14,13 @@ from fake_useragent import UserAgent
 
 # Paths
 dir_path = path.dirname(path.realpath(__file__))
-DATA_PATH = dir_path + '/data/'
+DATA_PATH = dir_path + '/data/running/'
 IN_DATA_PATH = dir_path + '/data/input_data/'
 
-def ieee_searcher(base_url, search_terms, scraped_times):
+def ieee_searcher(base_url, search_terms, scraped_times, topic=True):
       '''
       Collects from IEEE spectrum using search terms
+      TO DO - try is topics collection works better
       Only returns first ~4 entries so must be run regularily
       '''
       # Further URL parts
@@ -31,16 +32,28 @@ def ieee_searcher(base_url, search_terms, scraped_times):
       title_list = []
       url_list = []
       date_list = []
-
+      
       # Setting up fake user agent to have a proper header
       ua = UserAgent(verify_ssl=False, cache=False)
       user_agent = ua.random
       header = {'User-Agent': user_agent}
       
-      for term in search_terms['search_term']:
-            
+      # NOT used yet, possible alenative to term search - SEEMS TO WORK NICELY
+      topic_url = 'https://spectrum.ieee.org/topic/' # IF USED PUT IN COLLECTION_URL_DICT!!!!!
+      topic_list = ['artificial-intelligence', 'computing']#, 'robotics', 'telecommunications', 'consumer-electronics', 'biomedical', 'sensors']
+      
+      if topic == True:
+            search_paramenter = ['artificial-intelligence', 'computing']#, 'robotics', 'telecommunications', 'consumer-electronics', 'biomedical', 'sensors']
+      else:
+            search_paramenter = search_terms['search_term']
+      
+      for term in search_paramenter:
+      #for topic in topic_list:
             # Putting together final url
-            final_url = base_url + query_url + term + C + sort_criteria
+            if topic == True:
+                  final_url  = topic_url + term
+            else:
+                  final_url = base_url + query_url + term + C + sort_criteria
             print(final_url)
 
             # Making request and saving HTML of request
@@ -63,7 +76,11 @@ def ieee_searcher(base_url, search_terms, scraped_times):
 
                         date = i.find('div', class_="social-date")
                         date = date.text.replace('\n', '')
-                        date_parsed = datetime.strptime(date, '%d %b %Y')
+                        if 'h' in date:
+                              # IEEE uses hour tags for most recent articles
+                              date_parsed = datetime.now() - timedelta(hours=int(date.split('h')[0]))
+                        else:   
+                              date_parsed = datetime.strptime(date, '%d %b %Y')
 
                         print(date_parsed)
                         date_list.append(date_parsed)
@@ -84,7 +101,7 @@ def ieee_searcher(base_url, search_terms, scraped_times):
 
       # Looping through Dataframe to get text 
       for index, row in collected_df.iterrows():
-            # Only getting text from articles within timedelta = your search frequency
+            # Only getting text from articles newer than last collected
             if row.date > last_collected:
                   print('Fetching: ' + row.url)
 
@@ -100,18 +117,10 @@ def ieee_searcher(base_url, search_terms, scraped_times):
                         for p in paragraph_text:
                               article_text.append(p.text)
                   article_text = ' '.join(article_text)
-
-                  # Saving that text only if our search term appears in it
-                  # In principle for IEEE this is not needed, given the original collection uses search url
-                  for word in search_terms['search_term']:
-                        if word in article_text:
-                              save = list(row)
-                              save.append(article_text)
-                              relevant_text.append(save)                  
-                              print('Search term found: ' +  word)
-                              break
-                  else: 
-                        pass
+                  
+                  save = list(row)
+                  save.append(article_text)
+                  relevant_text.append(save) 
 
                   time.sleep(5)
             else:
@@ -139,7 +148,7 @@ def ieee_searcher(base_url, search_terms, scraped_times):
 if __name__ == '__main__':
       # Paths
       dir_path = path.dirname(path.realpath(__file__))
-      DATA_PATH = dir_path + '/data/'
+      DATA_PATH = dir_path + '/data/running/'
       IN_DATA_PATH = dir_path + '/data/input_data/'
       
       # Getting last collection date, if none initializing dictionary
@@ -165,4 +174,4 @@ if __name__ == '__main__':
             search_terms = json.loads(handle.read())
 
       # Run
-      ieee_searcher(base_url, search_terms, scraped_times)
+      ieee_searcher(base_url, search_terms, scraped_times, topic=True)

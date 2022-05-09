@@ -22,7 +22,7 @@ def get_pdfs(DATA_PATH, QUERY, df):
       have = set(os.listdir(pdf_dir))
 
       # Time out for requests
-      timeout_secs = 10 
+      timeout_secs = 20 
 
       for index, row in df.iterrows():
             if type(row.url) is list:
@@ -47,6 +47,8 @@ def get_pdfs(DATA_PATH, QUERY, df):
                         shutil.copyfileobj(req, fp)
             else:
                   print('%s exists, skipping' % (fname, ))
+
+            time.sleep(5)
 
 def pdf_to_text(DATA_PATH, QUERY):
       # Checking for a program and a folder
