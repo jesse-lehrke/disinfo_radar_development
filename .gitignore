@@ -8,9 +8,9 @@
 *.httr-oauth*
 
 pipe/credentials/
-pipe/data/
+#pipe/data/
 # Data folders
-data/
+/data/
 documentation/
 input_files/
 output_data/
