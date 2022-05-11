@@ -1,29 +1,115 @@
 .
 ├── analysis
-│   └── outlier_detection.ipynb
-├── collection
+│   ├── data
+│   ├── eda.ipynb
+│   ├── keras_binary.ipynb
+│   ├── outlier_detection.ipynb
+│   └── outlier_detection_tests.ipynb
+├── collection_development_(outdated)
 │   ├── arxiv_collect.ipynb
+│   ├── bash_collect
+│   ├── collect_arxiv.py
+│   ├── collect_cna.py
+│   ├── collect_ieee.py
+│   ├── collect_importai.py
+│   ├── collect_mit.py
+│   ├── collect_synced.py
+│   ├── geckodriver.log
+│   ├── main_collect_development.ipynb
+│   ├── reddit_collect.ipynb
 │   └── twitter_collect.ipynb
 ├── credentials
+│   ├── bot_token.json
+│   ├── reddit_cred.json
 │   ├── twitter_creds.json
+│   ├── twitter_creds_v2.json
 │   └── youtube_key.json
 ├── data
+│   ├── arxiv_deepfake.csv
 │   ├── arxiv_disinformation.csv
+│   ├── cna_CNA_data.csv
+│   ├── compiled.csv
+│   ├── data_with_labels.csv
+│   ├── deepfake_txt.csv
+│   ├── ieee_data.csv
+│   ├── importai_data.csv
+│   ├── input_data
+│   │   ├── collection_searchterms.json
+│   │   ├── collection_urls_df.jsonl
+│   │   └── collection_urls_dict.json
+│   ├── mit_data.csv
 │   ├── models
-│   └── raw
-│       └── arxiv_disinformation.jsonl
+│   │   ├── arxiv_deepfake_doc_vectors.pkl
+│   │   ├── arxiv_deepfake_iso_model.pkl
+│   │   ├── arxiv_deepfake_svm_model.pkl
+│   │   ├── arxiv_disinformation_doc_vectors.pkl
+│   │   ├── test_model.pkl
+│   │   ├── test_vectorizer.pkl
+│   │   ├── train_arxiv_deepfake_doc_vectors.pkl
+│   │   ├── train_arxiv_deepfake_iso_model.pkl
+│   │   └── train_arxiv_deepfake_svm_model.pkl
+│   ├── raw
+│   │   ├── arxiv_disinformation.jsonl
+│   │   ├── arxiv_fake news.jsonl
+│   │   ├── arxiv_GAN.jsonl
+│   │   ├── arxiv_GPT-3.jsonl
+│   │   └── testing
+│   │       ├── arxiv_deepfake.jsonl
+│   │       ├── arxiv_disinformation.jsonl
+│   │       └── arxiv_GAN.jsonl
+│   ├── reddit_machinelearning.csv
+│   ├── results.csv
+│   ├── synced_data.csv
+│   ├── test_compiled.csv
+│   ├── test_df.csv
+│   └── test_output.csv
 ├── documentation
-│   ├── Antrag_2021.12.20_English.docx
 │   ├── DisinfoRadar Research Onboarding.docx
-│   ├── Launch_report_outline.odt
-│   └── notes.txt
-├── file_stucture.txt
-├── input_files
+│   ├── DRAP_1.drawio.html
+│   └── DRAP_1.drawio.svg
+├── file_structure.txt
 ├── outputs
+├── pipe
+│   ├── analysis.py
+│   ├── collect_arxiv.py
+│   ├── collect_cna.py
+│   ├── collect_ieee.py
+│   ├── collect_importai.py
+│   ├── collection.py
+│   ├── collect_mit.py
+│   ├── collect_synced.py
+│   ├── credentials
+│   │   └── bot_token.json
+│   ├── data
+│   │   ├── archive
+│   │   │   └── results
+│   │   ├── final
+│   │   ├── input_data
+│   │   │   ├── collection_searchterms.json
+│   │   │   ├── collection_urls_dict.json
+│   │   │   ├── collection_urls_dict_v2.json
+│   │   │   └── scraped_times.json
+│   │   ├── models
+│   │   │   ├── test_model.pkl
+│   │   │   └── test_vectorizer.pkl
+│   │   ├── raw
+│   │   │   └── google_scholar_data.jsonl
+│   │   └── running
+│   ├── processing.py
+│   ├── utils_collection.py
+│   ├── utils_conversion.py
+│   ├── utils_notifications.py
+│   └── x_development_google_scholar.py
 ├── processing
-│   └── processing.ipynb
+│   ├── fetch_pdfs.ipynb
+│   ├── pdf_to_text.ipynb
+│   ├── processing.ipynb
+│   └── txts_to_csv.ipynb
 ├── README.md
 ├── requirements.txt
-└── tree.txt
+└── utils
+    ├── collection_utils.py
+    ├── conversion_utils.py
+    └── notifications.py
 
-10 directories, 16 files
+23 directories, 89 files

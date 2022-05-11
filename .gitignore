@@ -8,10 +8,11 @@
 *.httr-oauth*
 
 pipe/credentials/
-#pipe/data/
+#pipe/data/ ## Normally include here, but exception 
+
 # Data folders
 /data/
-documentation/
+#documentation/ ## May wish to include
 input_files/
 output_data/
 

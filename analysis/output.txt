@@ -1,5 +1,0 @@
-Running arxiv_deepfake.csv data set
-Best Accuracy : 0.9790
-{'vocab_size': 4221, 'num_filters': 64, 'maxlen': 173, 'kernel_size': 3, 'embedding_dim': 50}
-Test Accuracy : 0.9640
-
