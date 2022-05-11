@@ -22,4 +22,4 @@ In addition to the requirments.txt the following commands can install other anti
 
 ## Conceptual flow
 
-![DRAP_1 drawio](https://user-images.githubusercontent.com/59825124/159930897-7b2c24dd-4504-42d3-a84f-1f7e20ec7bb9.svg)
+![DRAP_1](https://user-images.githubusercontent.com/59825124/167805315-1666934b-032b-48b9-a275-11f88ad16c28.jpg)
