@@ -2,10 +2,12 @@
 
 Private repository for DRI employees and sub-contractors to develop and test initial functional ideas for Disinformation Radar project.
 
+The "pipe" folder should be kept clean and is for final MVP code (i.e. deployment ready with only debugging remaining)
+
 
 ## File structure
 
-As of 24.03.2022 (excluding VENV, including gitgnore directories) can be viewed here ![file structure](/file_structure.txt)
+As of 11.05.2022 (excluding VENV, including gitgnore directories) can be viewed here ![file structure](/file_structure.txt)
 (to-do: automate updating)
 
 ## Data
