@@ -10,7 +10,7 @@ As of 24.03.2022 (excluding VENV, including gitgnore directories) can be viewed 
 
 ## Data
 
-Data folders are set to gitignore. Sharing and syncing of data must be coordinated. 
+Data folders are set to gitignore except in "pipe". Sharing and syncing of data must be coordinated. 
 In the past Syncthing folders embedded in a GitHub directory work well.
 
 ## Dependencies
@@ -22,4 +22,4 @@ In addition to the requirments.txt the following commands can install other anti
 
 ## Conceptual flow
 
-![DRAP_1](https://user-images.githubusercontent.com/59825124/167805315-1666934b-032b-48b9-a275-11f88ad16c28.jpg)
+![DRAP_1 drawio](https://user-images.githubusercontent.com/59825124/167805479-17be45b3-d474-4b88-8476-975933a2d5c1.svg)
