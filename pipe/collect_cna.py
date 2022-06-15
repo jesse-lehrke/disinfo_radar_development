@@ -17,7 +17,8 @@ import json
 import time
 
 # Importing functions from our own modules
-#from utils_conversion import get_pdfs, pdf_to_text, text_to_csv, bulk_pdf_to_text
+#from utils_conversion import get_pdfs, pdf_to_text, text_to_csv, bulk_pdf_to_text, pdf_miner_to_text
+
 from utils_collection import split_article_on
 
 # Paths
@@ -123,8 +124,12 @@ def cna_searcher(base_url, scraped_times, search_terms):
 
       #QUERY = 'CNA' # should we seperate Russia and China?
 
-      # get_pdfs(DATA_PATH, QUERY, new_df)
-      # bulk_pdf_to_text(DATA_PATH, QUERY)
+      # pdf_miner_to_text(DATA_PATH, QUERY)
+      
+      ## OLD
+      ## get_pdfs(DATA_PATH, QUERY, new_df)
+      ## bulk_pdf_to_text(DATA_PATH, QUERY)
+      
       # df_temp = text_to_csv(DATA_PATH, QUERY)
 
       #new_df['title'] = temp_df
