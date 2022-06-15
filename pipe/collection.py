@@ -4,6 +4,7 @@ from collect_ieee import ieee_searcher
 from collect_importai import importai_searcher
 from collect_synced import synced_searcher
 from collect_mit import date_from_url, get_response, mit_searcher
+
 from utils_notifications import send_notification
 
 from os import listdir, path

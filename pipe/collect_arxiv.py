@@ -7,7 +7,7 @@ from pandas import json_normalize
 from datetime import datetime
 
 from utils_collection import aggragate
-from utils_conversion import get_pdfs, bulk_pdf_to_text, text_to_csv
+from utils_conversion import get_pdfs, bulk_pdf_to_text, text_to_csv, pdf_miner_to_text
 
 # Paths
 dir_path = path.dirname(path.realpath(__file__))
@@ -79,7 +79,8 @@ def arxiv_searcher(results, search_terms, scraped_times):
 
             get_pdfs(DATA_PATH, QUERY, new_df)
             
-            bulk_pdf_to_text(DATA_PATH, QUERY)
+            pdf_miner_to_text(DATA_PATH, QUERY)
+            # bulk_pdf_to_text(DATA_PATH, QUERY)
             # pdf_to_text(DATA_PATH, QUERY)
             
             df_temp = text_to_csv(DATA_PATH, QUERY)
@@ -134,7 +135,7 @@ if __name__ == '__main__':
       with open(load_file) as handle:
             search_terms = json.loads(handle.read())
 
-      arxiv_searcher(5, search_terms, scraped_times)
+      arxiv_searcher(1, search_terms, scraped_times)
 
 
 

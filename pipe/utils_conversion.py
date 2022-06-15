@@ -1,5 +1,12 @@
 from tika import parser
 
+import io
+from pdfminer.converter import TextConverter
+from pdfminer.pdfinterp import PDFPageInterpreter
+from pdfminer.pdfinterp import PDFResourceManager
+from pdfminer.pdfpage import PDFPage
+from pdfminer.layout import LAParams
+
 import pandas as pd
 import os
 from  urllib.request import urlopen
@@ -108,8 +115,8 @@ def text_to_csv(DATA_PATH, QUERY):
       #df_temp = pd.DataFrame(results)
 
       # !!! WARNING - DELETE DIR
-      shutil.rmtree(txt_dir)
-      shutil.rmtree(pdf_dir)
+      #shutil.rmtree(txt_dir)
+      #shutil.rmtree(pdf_dir)
 
       return results
 
@@ -145,5 +152,61 @@ def bulk_pdf_to_text(DATA_PATH, QUERY):
                               else:
                                     #pdf_contents = pdf_contents['content'].replace('\n+', '\n', regex=True)
                                     txt_file.write(pdf_contents['content'])
+
+def pdf_miner_to_text(DATA_PATH, QUERY):
+      done = []
+      problem = []
+
+      if not os.path.exists(DATA_PATH + QUERY + '_txt'):
+            os.makedirs(DATA_PATH + QUERY + '_txt')
+      
+      txt_dir = DATA_PATH + QUERY + '_txt'
+      pdf_dir = DATA_PATH + QUERY + '_pdfs'
+    
+      for root, dirs, files in os.walk(DATA_PATH):
+            for file in files:
+                  path_to_pdf = os.path.join(root, file)
+                  [stem, ext] = os.path.splitext(path_to_pdf)
+
+                  if ext == '.pdf':
+                        print("Processing " + path_to_pdf)
+
+                        #####
+                        resource_manager = PDFResourceManager()
+                        fake_file_handle = io.StringIO()
+                        
+                        # Perform layout analysis for all text
+                        laparams = LAParams()
+                        setattr(laparams, 'all_texts', True)
+
+                        converter = TextConverter(resource_manager, fake_file_handle, laparams=laparams)
+                        page_interpreter = PDFPageInterpreter(resource_manager, converter)
+                        
+                        with open(path_to_pdf, 'rb') as fh:
+                              for page in PDFPage.get_pages(fh, 
+                                                            caching=True,
+                                                            check_extractable=True):
+                                    page_interpreter.process_page(page)
+                                    
+                              pdf_contents = fake_file_handle.getvalue()
+                        
+                        # close open handles
+                        converter.close()
+                        fake_file_handle.close()
+
+                        # creating filename, path and exporting                        
+                        txt_basename = file.split('.pdf')[0]
+                        print(txt_dir)
+                        print(txt_basename)
+
+                        path_to_txt = os.path.join(txt_dir, txt_basename)
+
+                        with open(path_to_txt, 'w', encoding='utf-8') as txt_file:
+                              print("Writing contents to " + path_to_txt)
+                              if pdf_contents is None:
+                                    pass
+                              else:
+                                    #pdf_contents = pdf_contents['content'].replace('\n+', '\n', regex=True)
+                                    txt_file.write(pdf_contents)
 
 
