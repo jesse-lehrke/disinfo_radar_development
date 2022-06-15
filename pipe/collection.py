@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
       # TO DO - add arXiv
       try:
-            arxiv_searcher(10, search_terms, scraped_times)
+            arxiv_searcher(3, search_terms, scraped_times)
       except Exception as e:
             print("Scraping failed for ", 'arXiv')
             print(e)
