@@ -1,6 +1,10 @@
 from tika import parser
 
 import io
+
+from io import BytesIO
+from pdfminer.high_level import extract_text
+
 from pdfminer.converter import TextConverter
 from pdfminer.pdfinterp import PDFPageInterpreter
 from pdfminer.pdfinterp import PDFResourceManager
@@ -170,10 +174,15 @@ def pdf_miner_to_text(DATA_PATH, QUERY):
 
                   if ext == '.pdf':
                         print("Processing " + path_to_pdf)
-
+                        #from pdfminer.high_level import extract_text
+                        # def extract_text_from_pdf(pdf_file):
+                              # fake_file_handle = io.BytesIO()
+                              # pdfminer.high_level.extract_text_to_fp(pdf_file, out, codec='utf-8')
+                              # out.seek(0)
+                              # return out.read().decode('utf-8')
                         #####
                         resource_manager = PDFResourceManager()
-                        fake_file_handle = io.StringIO()
+                        fake_file_handle = io.StringIO() #io.BytesIO()
                         
                         # Perform layout analysis for all text
                         laparams = LAParams()
@@ -209,4 +218,51 @@ def pdf_miner_to_text(DATA_PATH, QUERY):
                                     #pdf_contents = pdf_contents['content'].replace('\n+', '\n', regex=True)
                                     txt_file.write(pdf_contents)
 
+from pdfminer.high_level import extract_text
 
+def pdf_miner_bytes_to_text(DATA_PATH, QUERY):
+      done = []
+      problem = []
+
+      if not os.path.exists(DATA_PATH + QUERY + '_txt'):
+            os.makedirs(DATA_PATH + QUERY + '_txt')
+      
+      txt_dir = DATA_PATH + QUERY + '_txt'
+      pdf_dir = DATA_PATH + QUERY + '_pdfs'
+    
+      for root, dirs, files in os.walk(DATA_PATH):
+            for file in files:
+                  path_to_pdf = os.path.join(root, file)
+                  [stem, ext] = os.path.splitext(path_to_pdf)
+
+                  if ext == '.pdf':
+                        print("Processing " + path_to_pdf)
+                        
+                        # Perform layout analysis for all text
+                        laparams = LAParams()
+                        setattr(laparams, 'all_texts', True)
+
+                        resource_manager = PDFResourceManager()
+                        fake_file_handle = io.BytesIO()
+
+                        pdf_contents = extract_text(path_to_pdf, fake_file_handle, codec='utf-8', laparams=laparams)
+                        
+                        # Bit worried not having this anymore, but perhaps "high_level" manages it
+                        #page_interpreter = PDFPageInterpreter(resource_manager, converter)
+
+                        fake_file_handle.close()
+
+                        #creating filename, path and exporting                        
+                        txt_basename = file.split('.pdf')[0]
+                        print(txt_dir)
+                        print(txt_basename)
+
+                        path_to_txt = os.path.join(txt_dir, txt_basename)
+
+                        with open(path_to_txt, 'w', encoding='utf-8') as txt_file:
+                              print("Writing contents to " + path_to_txt)
+                              if pdf_contents is None:
+                                    pass
+                              else:
+                                    #pdf_contents = pdf_contents['content'].replace('\n+', '\n', regex=True)
+                                    txt_file.write(pdf_contents)
