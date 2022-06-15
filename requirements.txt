@@ -68,10 +68,10 @@ pandas==1.4.1
 parsel==1.6.0
 parso==0.8.3
 pathy==0.6.1
+pdfminer==20191125
 pexpect==4.8.0
 pickleshare==0.7.5
 Pillow==9.0.1
-playwright==1.20.1
 praw==7.5.0
 prawcore==2.3.0
 preshed==3.0.6
@@ -83,8 +83,8 @@ pure-eval==0.2.2
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser==2.21
+pycryptodome==3.14.1
 pydantic==1.8.2
-pydude==0.18.0
 pyee==8.1.0
 Pygments==2.11.2
 pyOpenSSL==22.0.0
