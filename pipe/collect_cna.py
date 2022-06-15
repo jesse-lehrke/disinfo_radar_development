@@ -26,7 +26,7 @@ dir_path = path.dirname(path.realpath(__file__))
 DATA_PATH = dir_path + '/data/running/'
 IN_DATA_PATH = dir_path + '/data/input_data/'
 
-def cna_searcher(base_url, scraped_times, search_terms):
+def cna_searcher(base_url, search_terms, scraped_times):
       '''
       Doc string here
       '''
@@ -101,7 +101,10 @@ def cna_searcher(base_url, scraped_times, search_terms):
 
             # Getting all lines that indicate new section and splitting issue based on section start indicator
             if 'russia' in base_url:
-                  articles, header_list_sub = split_article_on(objects, 'h4', full_text)
+                  try:
+                        articles, header_list_sub = split_article_on(objects, 'h4', full_text)
+                  except IndexError:
+                        articles, header_list_sub = split_article_on(objects, 'h3', full_text)
             else:
                   articles, header_list_sub = split_article_on(objects, 'strong', full_text)
 
@@ -150,7 +153,16 @@ def cna_searcher(base_url, scraped_times, search_terms):
       with open(IN_DATA_PATH + 'scraped_times.json', 'w', encoding='utf8') as f:
             json.dump(scraped_times, f, indent=2, ensure_ascii=False)
 
+
+      # Saving collection time
+      scraped_times[base_url] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ') 
+      with open(IN_DATA_PATH + 'scraped_times.json', 'w', encoding='utf8') as f:
+            json.dump(scraped_times, f, indent=2, ensure_ascii=False)
+
       # TO DO Should we filter for keywords then? Or want it all?
+
+def cna_searcher_two(base_url, search_terms, scraped_times):
+      cna_searcher(base_url, search_terms, scraped_times)
 
 if __name__ == '__main__':
       # Paths
@@ -183,5 +195,5 @@ if __name__ == '__main__':
       with open(load_file) as handle:
             search_terms = json.loads(handle.read())
 
-      #cna_searcher(base_url_1, scraped_times, search_terms)
-      cna_searcher(base_url_2, scraped_times, search_terms)
+      cna_searcher(base_url_1, search_terms, scraped_times)
+      cna_searcher(base_url_2, search_terms, scraped_times)

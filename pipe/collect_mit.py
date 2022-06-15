@@ -29,8 +29,9 @@ def date_from_url(x):
 def get_response(API_Link, pages=1):
       # Get re
       with requests.get(API_Link + '&page=' + str(pages)) as response:
-            page_soup = soup(response.content, 'lxml')
-            return page_soup
+            #page_soup = soup(response.content, 'lxml')
+            #return page_soup
+            return response
 
 def mit_searcher(API_Link, search_terms, scraped_times):
       # MIT defined topic tags to search
@@ -46,7 +47,10 @@ def mit_searcher(API_Link, search_terms, scraped_times):
 
       # Getting responses
       for tag in topic_tags:
-            response = get_response(API_Link + tag, pages=str(1))
+            url = API_Link + tag
+            print(url)
+            response = get_response(url, pages=str(1))
+            print(response)
 
             j_response = json.loads(response.text)
             # Just adding response in list, not appending list

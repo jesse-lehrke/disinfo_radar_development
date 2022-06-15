@@ -1,6 +1,6 @@
 {
       "synced_searcher": "https://syncedreview.com/",
-      "cna_searcher": "https://www.cna.org/our-media/newsletters/ai-and-autonomy-in-russia?index=true",
+      "cna_searcher_two": "https://www.cna.org/our-media/newsletters/ai-and-autonomy-in-russia?index=true",
       "cna_searcher": "https://www.cna.org/our-media/newsletters/china-ai-and-autonomy-report?index=true",
       "mit_searcher": "https://wp.technologyreview.com/wp-json/irving/v1/data/term_archive?category_name=",
       "ieee_searcher": "https://spectrum.ieee.org/",

@@ -115,8 +115,8 @@ def text_to_csv(DATA_PATH, QUERY):
       #df_temp = pd.DataFrame(results)
 
       # !!! WARNING - DELETE DIR
-      #shutil.rmtree(txt_dir)
-      #shutil.rmtree(pdf_dir)
+      shutil.rmtree(txt_dir)
+      shutil.rmtree(pdf_dir)
 
       return results
 
