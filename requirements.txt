@@ -69,8 +69,10 @@ parsel==1.6.0
 parso==0.8.3
 pathy==0.6.1
 pdfminer==20191125
+pdfminer.six==20220524
 pexpect==4.8.0
 pickleshare==0.7.5
+pikepdf==5.1.5
 Pillow==9.0.1
 praw==7.5.0
 prawcore==2.3.0
