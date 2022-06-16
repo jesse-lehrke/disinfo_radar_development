@@ -135,7 +135,7 @@ if __name__ == '__main__':
       with open(load_file) as handle:
             search_terms = json.loads(handle.read())
 
-      arxiv_searcher(2, search_terms, scraped_times)
+      arxiv_searcher(10, search_terms, scraped_times)
 
 
 
