@@ -1,6 +1,6 @@
 # Disinfo_radar_development
 
-Private repository for DRI employees and sub-contractors to develop and test initial functional ideas for Disinformation Radar project. An overview of this project can be found in the documentation folder.
+Private (in principle, not practice) repository for DRI employees and sub-contractors to develop and test initial functional ideas for Disinformation Radar project. An overview of this project can be found in the documentation folder.
 
 ## File structure
 
